@@ -1,12 +1,10 @@
 [masters]
-  master-01 ansible_host=192.168.123.1
-  master-02 ansible_host=192.168.123.2
-  master-03 ansible_host=192.168.123.3
+  rocky01 ansible_host=10.10.25.43
+  rocky02 ansible_host=10.10.25.30
+  rocky03 ansible_host=10.10.25.64
 
 [workers]
-  worker-01 ansible_host=192.168.123.11
-  worker-02 ansible_host=192.168.123.12
-  worker-03 ansible_host=192.168.123.13
+  rocky04 ansible_host=10.10.25.197
 
 [k8s_cluster:children]
   masters

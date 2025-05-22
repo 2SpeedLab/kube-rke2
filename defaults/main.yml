@@ -98,9 +98,6 @@ rke2_server_node_taints: []
 # Agent nodes taints
 rke2_agent_node_taints: []
 
-# Pre-shared secret token that other server or agent nodes will register with when connecting to the cluster
-rke2_token: defaultSecret12345
-
 # RKE2 version
 rke2_version: v1.33.0+rke2r1
 
@@ -337,3 +334,6 @@ rke2_service_cidr:
 
 # Enable SELinux for rke2
 rke2_selinux: false
+
+vars_files:
+    - /vars/vars.yaml
