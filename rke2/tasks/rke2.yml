@@ -117,6 +117,7 @@
 - name: Airgap mode - additional images tarballs
   when:
     - rke2_airgap_mode
+    - rke2_airgap_copy_additional_tarballs is not none
     - ( rke2_airgap_copy_additional_tarballs | length > 0 )
     - rke2_airgap_implementation != 'exists'
   block:
@@ -278,7 +279,7 @@
     group: root
     mode: 0644
   with_items: "{{ rke2_custom_manifests }}"
-  when: rke2_custom_manifests
+  when: rke2_custom_manifests is not none and rke2_custom_manifests | length > 0
 
 - name: Copy Static Pods
   ansible.builtin.copy:
@@ -288,7 +289,7 @@
     group: root
     mode: 0644
   with_items: "{{ rke2_static_pods }}"
-  when: rke2_static_pods
+  when: rke2_static_pods is not none and rke2_static_pods | length > 0
 
 - name: Copy RKE2 environment file
   ansible.builtin.template:
