@@ -1,11 +1,19 @@
 [masters]
-  rocky01 ansible_host=10.10.25.43
-  rocky02 ansible_host=10.10.25.30
-  rocky03 ansible_host=10.10.25.64
+  master-01 ansible_host=10.10.24.229
+  master-02 ansible_host=10.10.25.114
+  master-03 ansible_host=10.10.25.178
 
 [workers]
-  rocky04 ansible_host=10.10.25.197
+  worker-04 ansible_host=10.10.25.75
+  worker-05 ansible_host=10.10.24.89
+  worker-06 ansible_host=10.10.25.20
 
 [k8s_cluster:children]
   masters
   workers
+
+[all:vars]
+  ansible_ssh_private_key_file=~/.ssh/Lab/id_ed25519
+  ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+  ansible_user=root
+  gen_certs=true
