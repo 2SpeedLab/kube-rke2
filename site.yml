@@ -7,3 +7,4 @@
     - rke2_prepare
     - rke2_kubevip
     - rke2_cluster
+    - rke2_cilium

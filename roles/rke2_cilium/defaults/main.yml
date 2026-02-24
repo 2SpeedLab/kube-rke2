@@ -1,0 +1,18 @@
+---
+# Cilium Helm chart version
+cilium_version: "1.17.1"
+
+# Cilium Helm chart repository URL
+cilium_helm_repo: "https://helm.cilium.io/"
+
+# Helm release name
+cilium_release_name: "cilium"
+
+# Namespace to deploy Cilium into
+cilium_namespace: "kube-system"
+
+# kube-proxy replacement mode (true / false / partial)
+cilium_kubeproxy_replacement: "true"
+
+# Additional helm values passed as --set key=value pairs (string)
+cilium_helm_extra_args: ""
