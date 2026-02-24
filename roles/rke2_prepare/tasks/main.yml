@@ -25,3 +25,8 @@
 
     - name: Flush handlers
       ansible.builtin.meta: flush_handlers
+
+    - name: Install helm if not present
+      ansible.builtin.package:
+        name: helm
+        state: present
