@@ -24,8 +24,13 @@ rke2_node_name: "{{ inventory_hostname }}"
 # Local data directory for RKE2
 rke2_data_path: /var/lib/rancher/rke2
 
-# Deploy RKE2 with no built-in CNI (Cilium is installed separately via rke2_cilium role)
-rke2_cni: 'none'
+# Cilium installation method:
+#   helm        - rke2_cni is set to 'none'; Cilium is installed by the rke2_cilium role via Helm
+#   integrated  - rke2_cni is set to 'cilium'; RKE2 deploys and manages Cilium itself
+cilium_install_method: integrated
+
+# CNI is derived from cilium_install_method; override only if you are not using the rke2_cilium role
+rke2_cni: "{{ 'none' if cilium_install_method == 'helm' else cilium_install_method }}"
 
 # Default Ansible Inventory Group name for RKE2 cluster
 rke2_cluster_group_name: k8s_cluster

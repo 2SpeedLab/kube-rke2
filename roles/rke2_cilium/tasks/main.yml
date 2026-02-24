@@ -1,6 +1,8 @@
 ---
 - name: Install Cilium via Helm chart
-  when: inventory_hostname == groups[rke2_servers_group_name].0
+  when:
+    - cilium_install_method == 'helm'
+    - inventory_hostname == groups[rke2_servers_group_name].0
   block:
     - name: Add Cilium Helm repository
       ansible.builtin.command:

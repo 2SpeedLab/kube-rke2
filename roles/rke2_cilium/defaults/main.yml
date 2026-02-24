@@ -1,4 +1,9 @@
 ---
+# Cilium installation method: 'helm' or 'integrated'
+# helm        - install Cilium via Helm chart (requires rke2_cni: none)
+# integrated  - let RKE2 deploy Cilium itself (rke2_cni: cilium); Helm tasks are skipped
+cilium_install_method: integrated
+
 # Cilium Helm chart version
 cilium_version: "1.17.1"
 
