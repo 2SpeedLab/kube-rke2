@@ -1,0 +1,28 @@
+---
+# Specify which image is used for kube-vip container
+rke2_kubevip_image: ghcr.io/kube-vip/kube-vip:v0.6.4
+
+# Specify which image is used for kube-vip cloud provider container
+rke2_kubevip_cloud_provider_image: ghcr.io/kube-vip/kube-vip-cloud-provider:v0.0.4
+
+# Install kubevip cloud provider if rke2_ha_mode_kubevip is true
+rke2_kubevip_cloud_provider_enable: true
+
+# Enable kube-vip to watch Services of type LoadBalancer
+rke2_kubevip_svc_enable: true
+
+# Enable kube-vip IPVS load balancer for control plane
+rke2_kubevip_ipvs_lb_enable: false
+
+rke2_kubevip_service_election_enable: false
+
+# Prometheus metrics port for kube-vip
+rke2_kubevip_metrics_port: 2112
+
+# kubevip load balancer IP range
+rke2_loadbalancer_ip_range: {}
+#  range-global: 192.168.1.50-192.168.1.100
+#  cidr-finance: 192.168.0.220/29,192.168.0.230/29
+
+# (Optional) Configure nginx via HelmChartConfig
+rke2_ingress_nginx_values: {}

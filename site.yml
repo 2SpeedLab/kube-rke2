@@ -2,4 +2,8 @@
   hosts: all
   become: yes
   roles:
-    - role: rke2
+    - rke2_keepalived
+    - rke2_install
+    - rke2_prepare
+    - rke2_kubevip
+    - rke2_cluster

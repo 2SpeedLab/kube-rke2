@@ -1,0 +1,37 @@
+---
+- name: Create the RKE2 config dir
+  ansible.builtin.file:
+    state: directory
+    path: /etc/rancher/rke2
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy RKE2 config
+  ansible.builtin.template:
+    src: "{{ rke2_config }}"
+    dest: /etc/rancher/rke2/config.yaml
+    owner: root
+    group: root
+    mode: 0600
+  notify: "Config file changed"
+
+- name: Copy kubelet config
+  ansible.builtin.template:
+    src: kubelet-config.yaml.j2
+    dest: /etc/rancher/rke2/kubelet-config.yaml
+    owner: root
+    group: root
+    mode: 0600
+  when: rke2_kubelet_config | length > 0
+  notify: "Config file changed"
+
+- name: Copy Containerd Registry Configuration file
+  ansible.builtin.template:
+    src: "{{ rke2_custom_registry_path }}"
+    dest: /etc/rancher/rke2/registries.yaml
+    owner: root
+    group: root
+    mode: 0600
+  when: rke2_custom_registry_mirrors | length > 0 or rke2_custom_registry_configs | length > 0
+  notify: "Config file changed"

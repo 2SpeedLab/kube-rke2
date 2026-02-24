@@ -1,0 +1,49 @@
+---
+# The node type - server or agent
+rke2_type: "{{ 'server' if inventory_hostname in groups[rke2_servers_group_name] else 'agent' if inventory_hostname in groups[rke2_agents_group_name] }}"
+
+# Deploy the control plane in HA mode
+rke2_ha_mode: false
+
+# Install and configure Keepalived on Server nodes
+rke2_ha_mode_keepalived: true
+
+# Install and configure kube-vip LB and VIP for cluster
+# rke2_ha_mode_keepalived needs to be false
+rke2_ha_mode_kubevip: false
+
+# Kubernetes API and RKE2 registration IP address
+rke2_api_ip: "{{ hostvars[groups[rke2_servers_group_name].0]['ansible_default_ipv4']['address'] }}"
+
+# optional option for RKE2 Server to listen on a private port
+rke2_api_private_port: 9345
+
+# The value for the node-name configuration item
+rke2_node_name: "{{ inventory_hostname }}"
+
+# Local data directory for RKE2
+rke2_data_path: /var/lib/rancher/rke2
+
+# Deploy RKE2 with default CNI canal
+rke2_cni: [canal]
+
+# Default Ansible Inventory Group name for RKE2 cluster
+rke2_cluster_group_name: k8s_cluster
+
+# Default Ansible Inventory Group name for RKE2 Servers
+rke2_servers_group_name: masters
+
+# Default Ansible Inventory Group name for RKE2 Agents
+rke2_agents_group_name: workers
+
+# RKE2 installation method (do not change this option)
+rke2_method: tar
+
+# Service name derived from node type
+rke2_service_name: "rke2-{{ rke2_type }}.service"
+
+# Flag set by handlers to trigger rolling restart on config change
+rke2_restart_needed: false
+
+# Cluster token
+rke2_token: 2SpeedLabSecret12345
