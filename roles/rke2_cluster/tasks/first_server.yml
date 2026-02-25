@@ -103,7 +103,7 @@
   delay: 15
   when:
     - not ansible_check_mode
-    - rke2_cni == "none" | bool == false
+    - rke2_cni == 'none'
 
 - name: Wait for the first server be ready - with CNI
   ansible.builtin.shell: |
@@ -118,7 +118,7 @@
   delay: 15
   when:
     - not ansible_check_mode
-    - rke2_cni != 'none' | bool == false
+    - rke2_cni != 'none'
 
 - name: Restore etcd
   when: do_etcd_restore is defined or do_etcd_restore_from_s3 is defined
