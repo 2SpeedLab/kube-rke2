@@ -3,17 +3,21 @@
 rke2_type: "{{ 'server' if inventory_hostname in groups[rke2_servers_group_name] else 'agent' if inventory_hostname in groups[rke2_agents_group_name] }}"
 
 # Deploy the control plane in HA mode
-rke2_ha_mode: false
+rke2_ha_mode: true
 
 # Install and configure Keepalived on Server nodes
-rke2_ha_mode_keepalived: true
+rke2_ha_mode_keepalived: false
 
 # Install and configure kube-vip LB and VIP for cluster
 # rke2_ha_mode_keepalived needs to be false
-rke2_ha_mode_kubevip: false
+rke2_ha_mode_kubevip: true
 
 # Kubernetes API and RKE2 registration IP address
-rke2_api_ip: "{{ hostvars[groups[rke2_servers_group_name].0]['ansible_default_ipv4']['address'] }}"
+rke2_api_ip: "{{ kube_vip_address if kube_vip_address is defined else hostvars[groups[rke2_servers_group_name].0]['ansible_default_ipv4']['address'] }}"
+
+kube_vip_address: "10.10.24.25"
+
+rke2_api_cidr: "23"
 
 # optional option for RKE2 Server to listen on a private port
 rke2_api_private_port: 9345
