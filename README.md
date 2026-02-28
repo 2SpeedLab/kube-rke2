@@ -24,4 +24,8 @@ Run
 make build    # build image only
 make run      # build + launch container (shell drops you in /workspace)
 ```
+After you run container, run ansible command `ansible-playbook site.yml -i inventory.yml --tags kubeconfig` to get kubeconfig. <br>
+Export `export KUBECONFIG=~/.kube/2SpeedLab.yaml` and run this command check connect to cluster
+`kgp` <br>
+
 If you want to delete container `make clean`
