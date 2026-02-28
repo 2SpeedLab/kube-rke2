@@ -15,3 +15,13 @@ ansible-playbook site.yml -i inventory.yml --tags gateway_api
 ``` 
 ansible-playbook reset.yml -i inventory.yml
 ```
+
+### How to usage
+1.1 Build docker container <br>
+In Makefile, change `SSH_KEY := $(HOME)/.ssh/Lab/id_ed25519` suitable for your ssh key. <br>
+Run 
+``` 
+make build    # build image only
+make run      # build + launch container (shell drops you in /workspace)
+```
+If you want to delete container `make clean`

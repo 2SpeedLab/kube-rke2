@@ -1,0 +1,9 @@
+---
+# Local path where the kubeconfig will be saved
+kubeconfig_local_path: "~/.kube"
+# Local filename for the downloaded kubeconfig
+kubeconfig_local_file: "{{ rke2_cluster_name | default('rke2') }}.yaml"
+# Which server IP to embed in the kubeconfig (defaults to first master's actual IP)
+kubeconfig_server_ip: "{{ hostvars[groups[rke2_servers_group_name].0]['ansible_host'] }}"
+# Port for the Kubernetes API server
+kubeconfig_server_port: "{{ rke2_apiserver_dest_port | default(6443) }}"

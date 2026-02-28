@@ -19,3 +19,12 @@
   tags: gateway_api
   roles:
     - rke2_gateway_api
+
+- name: Post-install - Copy kubeconfig to localhost with server IP
+  hosts: masters
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  tags: kubeconfig
+  roles:
+    - rke2_kubeconfig
