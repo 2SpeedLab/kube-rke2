@@ -25,14 +25,26 @@ tls-san:
 {% if rke2_cluster_domain is defined %}
 cluster-domain: {{ rke2_cluster_domain }}
 {% endif %}
+{% if rke2_cluster_name is defined %}
+cluster-name: {{ rke2_cluster_name }}
+{% endif %}
 {% if ( combined_node_taints is defined and combined_node_taints|length > 0) %}
 node-taint:
 {% for taint in combined_node_taints %}
   - {{ taint }}
 {% endfor %}
 {% endif %}
-{% if rke2_disable and ( inventory_hostname|string() in groups[rke2_servers_group_name] ) %}
-disable: {{ rke2_disable }}
+{% if inventory_hostname in groups[rke2_servers_group_name] %}
+{% set _disable = rke2_disable | default([]) %}
+{% if rke2_disable_ingress_nginx | default(false) | bool %}
+{% set _disable = _disable + ['rke2-ingress-nginx'] %}
+{% endif %}
+{% if _disable %}
+disable:
+{% for item in _disable %}
+  - {{ item }}
+{% endfor %}
+{% endif %}
 {% endif %}
 {% if rke2_kube_apiserver_args is defined and inventory_hostname in groups[rke2_servers_group_name] %}
 kube-apiserver-arg: {{ rke2_kube_apiserver_args}}

@@ -10,3 +10,12 @@
     - rke2_kubevip
     - rke2_cilium
     - rke2_cluster
+
+- name: Post-install - Gateway API CRDs and disable ingress
+  hosts: all
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  tags: gateway_api
+  roles:
+    - rke2_gateway_api

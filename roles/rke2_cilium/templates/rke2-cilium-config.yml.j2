@@ -1,0 +1,38 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: rke2-cilium
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    kubeProxyReplacement: {{ cilium_kubeproxy_replacement }}
+    k8sServiceHost: {{ rke2_api_ip }}
+    k8sServicePort: {{ rke2_apiserver_dest_port }}
+    securityContext:
+      capabilities:
+        ciliumAgent:  # Comprehensive list for stability; includes for embedded mode
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_MODULE
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+          - NET_BIND_SERVICE
+    l7Proxy: true
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true
+    ipv6:
+      enabled: false
+{% if cilium_integrated_extra_values is defined and cilium_integrated_extra_values %}
+{{ cilium_integrated_extra_values | indent(4, true) }}
+{% endif %}

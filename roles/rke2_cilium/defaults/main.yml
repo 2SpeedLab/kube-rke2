@@ -19,5 +19,12 @@ cilium_namespace: "kube-system"
 # kube-proxy replacement mode (true / false / partial)
 cilium_kubeproxy_replacement: "true"
 
-# Additional helm values passed as --set key=value pairs (string)
+# Additional helm values passed as --set key=value pairs (string, helm method only)
 cilium_helm_extra_args: ""
+cilium_integrated_extra_values: |
+  bpf:
+    masquerade: true
+    ipv4NativeRoutingCIDR: "10.42.0.0/16"
+
+# When not enable this feature
+# cilium_integrated_extra_values: ""

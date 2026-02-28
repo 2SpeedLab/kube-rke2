@@ -1,4 +1,17 @@
 ---
+- name: Configure Cilium via HelmChartConfig (integrated mode)
+  when:
+    - cilium_install_method == 'cilium'
+    - inventory_hostname == groups[rke2_servers_group_name].0
+  block:
+    - name: Deploy rke2-cilium HelmChartConfig
+      ansible.builtin.template:
+        src: rke2-cilium-config.yml.j2
+        dest: /var/lib/rancher/rke2/server/manifests/rke2-cilium-config.yaml
+        owner: root
+        group: root
+        mode: "0640"
+
 - name: Install Cilium via Helm chart
   when:
     - cilium_install_method == 'helm'

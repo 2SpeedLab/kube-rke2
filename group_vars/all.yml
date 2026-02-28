@@ -33,6 +33,9 @@ rke2_data_path: /var/lib/rancher/rke2
 #   integrated  - rke2_cni is set to 'cilium'; RKE2 deploys and manages Cilium itself
 cilium_install_method: cilium
 
+# Disable kube-proxy so Cilium can replace it via eBPF (required for kubeProxyReplacement)
+disable_kube_proxy: true
+
 # CNI is derived from cilium_install_method; override only if you are not using the rke2_cilium role
 rke2_cni: "{{ 'none' if cilium_install_method == 'helm' else cilium_install_method }}"
 
@@ -54,5 +57,11 @@ rke2_service_name: "rke2-{{ rke2_type }}.service"
 # Flag set by handlers to trigger rolling restart on config change
 rke2_restart_needed: false
 
+# Cluster name (default: local)
+rke2_cluster_name: 2SpeedLab
+
 # Cluster token
 rke2_token: 2SpeedLabSecret12345
+
+# Disable RKE2 built-in ingress-nginx (set to true when using Cilium Gateway API)
+rke2_disable_ingress_nginx: false
