@@ -1,0 +1,72 @@
+---
+- name: Enable IPVS kernel module
+  community.general.modprobe:
+    name: ip_vs
+    state: present
+    persistent: present
+  when:
+    - rke2_kubevip_ipvs_lb_enable | bool
+    - inventory_hostname in groups[rke2_servers_group_name]
+    - rke2_ha_mode | bool
+    - rke2_ha_mode_kubevip | bool
+    - not rke2_ha_mode_keepalived | bool
+
+- name: Copy kube-vip manifests to the masternode
+  when:
+    - inventory_hostname == groups[rke2_servers_group_name].0
+    - rke2_ha_mode | bool
+    - rke2_ha_mode_kubevip | bool
+    - not rke2_ha_mode_keepalived | bool
+  block:
+    - name: Create the RKE2 manifests directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ rke2_data_path }}/server/manifests"
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Copy kube-vip files to first server
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ rke2_data_path }}/server/manifests/{{ item | basename | regex_replace('.j2$', '') }}"
+        owner: root
+        group: root
+        mode: 0664
+      loop:
+        - kube-vip/kube-vip.yml.j2
+        - kube-vip/kube-vip-rbac.yml.j2
+
+    - name: Copy kube-vip load balancer manifests to first server
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ rke2_data_path }}/server/manifests/{{ item | basename | regex_replace('.j2$', '') }}"
+        owner: root
+        group: root
+        mode: 0664
+      loop:
+        - kube-vip/kube-vip-cloud-provider-configmap.yml.j2
+        - kube-vip/kube-vip-cloud-controller.yml.j2
+      when: rke2_kubevip_cloud_provider_enable | bool
+
+- name: Copy ingress-nginx manifests to the masternode
+  when:
+    - inventory_hostname == groups[rke2_servers_group_name].0
+    - rke2_ingress_nginx_values is defined
+    - rke2_ingress_nginx_values | length > 0
+  block:
+    - name: Create the RKE2 manifests directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ rke2_data_path }}/server/manifests"
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Copy ingress-nginx files to first server
+      ansible.builtin.template:
+        src: ingress-nginx-config.yml.j2
+        dest: "{{ rke2_data_path }}/server/manifests/rke2-ingress-nginx-config.yaml"
+        owner: root
+        group: root
+        mode: 0664

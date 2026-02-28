@@ -1,0 +1,30 @@
+---
+# Cilium installation method: 'helm' or 'integrated'
+# helm        - install Cilium via Helm chart (requires rke2_cni: none)
+# integrated  - let RKE2 deploy Cilium itself (rke2_cni: cilium); Helm tasks are skipped
+cilium_install_method: integrated
+
+# Cilium Helm chart version
+cilium_version: "1.17.1"
+
+# Cilium Helm chart repository URL
+cilium_helm_repo: "https://helm.cilium.io/"
+
+# Helm release name
+cilium_release_name: "cilium"
+
+# Namespace to deploy Cilium into
+cilium_namespace: "kube-system"
+
+# kube-proxy replacement mode (true / false / partial)
+cilium_kubeproxy_replacement: "true"
+
+# Additional helm values passed as --set key=value pairs (string, helm method only)
+cilium_helm_extra_args: ""
+cilium_integrated_extra_values: |
+  bpf:
+    masquerade: true
+    ipv4NativeRoutingCIDR: "10.42.0.0/16"
+
+# When not enable this feature
+# cilium_integrated_extra_values: ""

@@ -1,0 +1,59 @@
+---
+# RKE2 version
+rke2_version: v1.33.0+rke2r1
+
+# URL to RKE2 repository
+rke2_channel_url: https://update.rke2.io/v1-release/channels
+
+# URL to RKE2 install bash script
+rke2_install_bash_url: https://get.rke2.io
+
+# Default URL to fetch artifacts
+rke2_artifact_url: https://github.com/rancher/rke2/releases/download/
+
+# Local path to store artifacts
+rke2_artifact_path: /rke2/artifact
+
+# Airgap required artifacts
+rke2_artifact:
+  - sha256sum-{{ rke2_architecture }}.txt
+  - rke2.linux-{{ rke2_architecture }}.tar.gz
+  - rke2-images.linux-{{ rke2_architecture }}.tar.zst
+
+# Changes the deploy strategy to install based on local artifacts
+rke2_airgap_mode: false
+
+# Airgap implementation type - download, copy or exists
+rke2_airgap_implementation: download
+
+# Local source path where artifacts are stored
+rke2_airgap_copy_sourcepath: local_artifacts
+
+# Tarball images for additional components to be copied from rke2_airgap_copy_sourcepath to the nodes
+rke2_airgap_copy_additional_tarballs: []
+
+# Destination for airgap additional images tarballs
+rke2_tarball_images_path: "{{ rke2_data_path }}/agent/images"
+
+# Architecture to be downloaded, currently there are releases for amd64 and s390x
+rke2_architecture: amd64
+
+# Destination directory for RKE2 installation script
+rke2_install_script_dir: /var/tmp
+
+# RKE2 channel
+rke2_channel: stable
+
+# Determines whether downgrades of the RKE2 version are allowed.
+rke2_allow_downgrade: false
+
+# Path to custom manifests deployed during the RKE2 installation
+rke2_custom_manifests:
+
+# Path to static pods deployed during the RKE2 installation
+rke2_static_pods:
+
+# (Optional) Configure Proxy
+# rke2_environment_options: []
+#   - "option=value"
+#   - "HTTP_PROXY=http://your-proxy.example.com:8888"

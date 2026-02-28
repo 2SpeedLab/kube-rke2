@@ -1,0 +1,102 @@
+---
+# Add additional SANs in k8s API TLS cert
+rke2_additional_sans: []
+
+# API Server destination port
+rke2_apiserver_dest_port: 6443
+
+# Server nodes taints
+rke2_server_node_taints: []
+  # - 'CriticalAddonsOnly=true:NoExecute'
+
+# Agent nodes taints
+rke2_agent_node_taints: []
+
+# Path to RKE2 config file template
+rke2_config: config.yaml.j2
+
+# Path to Container registry config file template
+rke2_custom_registry_path: registries.yaml.j2
+
+# Configure custom Containerd Registry
+rke2_custom_registry_mirrors: []
+
+# Configure custom Containerd Registry additional configuration
+rke2_custom_registry_configs: []
+
+# Etcd snapshot source directory
+rke2_etcd_snapshot_source_dir: etcd_snapshots
+
+# Etcd snapshot file name.
+rke2_etcd_snapshot_file:
+
+# Etcd snapshot location
+rke2_etcd_snapshot_destination_dir: "{{ rke2_data_path }}/server/db/snapshots"
+
+# Override default containerd snapshotter
+rke2_snapshotter: "{{ rke2_snapshooter }}"
+rke2_snapshooter: overlayfs
+
+# Download Kubernetes config file to the Ansible controller
+rke2_download_kubeconf: false
+
+# Name of the Kubernetes config file will be downloaded to the Ansible controller
+rke2_download_kubeconf_file_name: rke2.yaml
+
+# Destination directory where the Kubernetes config file will be downloaded to the Ansible controller
+rke2_download_kubeconf_path: /tmp
+
+# Cordon, drain the node which is being upgraded.
+rke2_drain_node_during_upgrade: false
+
+# Additional args that will be passed to the kubectl drain command
+rke2_drain_additional_args: ""
+
+# Wait for all pods to be have a status of running or succeeded after rke2-service restart
+rke2_wait_for_all_pods_to_be_ready: false
+
+# Wait for all pods to be ready after rke2-service restart
+rke2_wait_for_all_pods_to_be_healthy: false
+
+# The args passed to the kubectl wait command
+rke2_wait_for_all_pods_to_be_healthy_args: --for=condition=Ready -A --all pod --field-selector=metadata.namespace!=kube-system,status.phase!=Succeeded
+
+# default pod network range for rke2
+rke2_cluster_cidr:
+  - 10.42.0.0/16
+
+# default service network range for rke2
+rke2_service_cidr:
+  - 10.43.0.0/16
+
+# Enable SELinux for rke2
+rke2_selinux: false
+
+# Enable debug mode (rke2-service)
+rke2_debug: false
+
+# Do not deploy packaged components and delete any deployed components
+rke2_disable:
+
+# Option to disable kube-proxy
+disable_kube_proxy: false
+
+# Option to disable builtin cloud controller
+rke2_disable_cloud_controller: false
+
+# Cloud provider to use for the cluster
+rke2_cloud_provider_name: "external"
+
+# (Optional) Customize kubelet config using KubeletConfiguration
+rke2_kubelet_config: {}
+
+# (Optional) A list of Kubernetes API server flags
+# rke2_kube_apiserver_args: []
+
+# (Optional) Customize default kube-controller-manager arguments
+# rke2_kube_controller_manager_arg:
+#   - "bind-address=0.0.0.0"
+
+# (Optional) Customize default kube-scheduler arguments
+# rke2_kube_scheduler_arg:
+#   - "bind-address=0.0.0.0"

@@ -1,0 +1,12 @@
+- name: Deploy RKE2
+  hosts: all
+  become: yes
+  tasks:
+    - name: Uninstall RKE2 and cleanup
+      ansible.builtin.shell: |
+        /usr/local/bin/rke2-uninstall.sh
+        rm -rf /var/lib/rancher/rke2/ /etc/rancher/rke2/
+
+    - name: reboot
+      ansible.builtin.reboot:
+        reboot_timeout: 300

@@ -1,5 +1,21 @@
 - name: Deploy RKE2
   hosts: all
   become: yes
+  vars_files:
+    - group_vars/all.yml
   roles:
-    - role: rke2
+    - rke2_prepare
+    - rke2_install
+    - rke2_keepalived
+    - rke2_kubevip
+    - rke2_cilium
+    - rke2_cluster
+
+- name: Post-install - Gateway API CRDs and disable ingress
+  hosts: all
+  become: yes
+  vars_files:
+    - group_vars/all.yml
+  tags: gateway_api
+  roles:
+    - rke2_gateway_api
