@@ -2,7 +2,7 @@
 export OSH='/root/.oh-my-bash'
 
 # Theme
-OSH_THEME="axin"
+OSH_THEME="envy"
 
 # Timestamps in history
 HIST_STAMPS='dd.mm.yyyy'
