@@ -1,0 +1,6 @@
+---
+# Gateway API CRDs manifest URL
+gateway_api_crds_url: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml"
+
+# Disable RKE2 built-in ingress-nginx
+gateway_api_disable_ingress: true

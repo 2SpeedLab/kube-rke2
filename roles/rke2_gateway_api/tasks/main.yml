@@ -1,0 +1,182 @@
+---
+- name: Install Gateway API CRDs
+  when: inventory_hostname == groups[rke2_servers_group_name].0
+  tags: gateway_api
+  block:
+    - name: Apply Gateway API CRDs
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          apply -f {{ gateway_api_crds_url }} --server-side
+      args:
+        executable: /bin/bash
+      changed_when: false
+      retries: 5
+      delay: 10
+      when: not ansible_check_mode
+
+    - name: Wait for Gateway API CRDs to be established
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          wait --for=condition=Established crd/gatewayclasses.gateway.networking.k8s.io --timeout=60s
+      args:
+        executable: /bin/bash
+      changed_when: false
+      retries: 6
+      delay: 10
+      when: not ansible_check_mode
+
+    - name: Enable gatewayAPI in Cilium HelmChartConfig
+      ansible.builtin.shell: |
+        python3 << 'EOF'
+        import subprocess, json, sys
+
+        kubectl = "{{ rke2_data_path }}/bin/kubectl"
+        kubeconfig = "/etc/rancher/rke2/rke2.yaml"
+        base_cmd = [kubectl, "--kubeconfig", kubeconfig]
+
+        result = subprocess.run(
+            base_cmd + ["get", "helmchartconfig", "rke2-cilium",
+                        "-n", "kube-system",
+                        "-o", "jsonpath={.spec.valuesContent}"],
+            capture_output=True, text=True
+        )
+        current = result.stdout
+
+        if "gatewayAPI:" in current:
+            print("gatewayAPI already enabled, skipping")
+            sys.exit(0)
+
+        patched = current.rstrip("\n") + "\ngatewayAPI:\n  enabled: true\n"
+        patch = json.dumps({"spec": {"valuesContent": patched}})
+
+        subprocess.run(
+            base_cmd + ["patch", "helmchartconfig", "rke2-cilium",
+                        "-n", "kube-system", "--type=merge", "-p", patch],
+            check=True
+        )
+        print("gatewayAPI enabled successfully")
+        EOF
+      args:
+        executable: /bin/bash
+      changed_when: true
+      when: not ansible_check_mode
+
+    - name: Restart Cilium Operator to register Cilium CRDs
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          rollout restart deployment/cilium-operator -n kube-system
+      args:
+        executable: /bin/bash
+      changed_when: true
+      when: not ansible_check_mode
+
+    - name: Wait for Cilium Operator to be ready
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          rollout status deployment/cilium-operator -n kube-system
+      args:
+        executable: /bin/bash
+      register: cilium_operator_rollout
+      until: cilium_operator_rollout.rc == 0
+      retries: 40
+      delay: 15
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Wait for Cilium CRDs to be registered by Operator
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          get crd ciliumenvoyconfigs.cilium.io ciliumclusterwideenvoyconfigs.cilium.io \
+          --no-headers 2>/dev/null | wc -l || echo 0
+      args:
+        executable: /bin/bash
+      register: cilium_crds_count
+      until: cilium_crds_count.stdout | trim | int >= 2
+      retries: 24
+      delay: 10
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Restart Cilium daemonset
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          rollout restart daemonset/cilium -n kube-system
+      args:
+        executable: /bin/bash
+      changed_when: true
+      when: not ansible_check_mode
+
+    - name: Wait for Cilium rollout to complete
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          rollout status daemonset/cilium -n kube-system
+      args:
+        executable: /bin/bash
+      register: cilium_rollout
+      until: cilium_rollout.rc == 0
+      retries: 40
+      delay: 15
+      changed_when: false
+      when: not ansible_check_mode
+
+- name: Verify Gateway API is enabled
+  when:
+    - inventory_hostname == groups[rke2_servers_group_name].0
+    - not ansible_check_mode
+  tags: gateway_api
+  block:
+    - name: Wait for Cilium GatewayClass to be created
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          get gatewayclass cilium \
+          -o jsonpath='{.status.conditions[?(@.type=="Accepted")].status}' 2>/dev/null || true
+      args:
+        executable: /bin/bash
+      register: gatewayclass_status
+      until: gatewayclass_status.stdout == "True"
+      retries: 20
+      delay: 15
+      changed_when: false
+
+    - name: Show Gateway API status
+      ansible.builtin.shell: |
+        echo "=== Gateway API CRDs ===" && \
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          get crd | grep gateway.networking.k8s.io && \
+        echo "=== GatewayClass ===" && \
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          get gatewayclass
+      args:
+        executable: /bin/bash
+      changed_when: false
+      register: gateway_api_summary
+
+    - name: Gateway API status
+      ansible.builtin.debug:
+        var: gateway_api_summary.stdout_lines
+
+- name: Disable rke2-ingress-nginx
+  when: gateway_api_disable_ingress | bool
+  tags: disable_ingress
+  block:
+    - name: Add disable ingress-nginx to RKE2 server config
+      ansible.builtin.blockinfile:
+        path: /etc/rancher/rke2/config.yaml
+        marker: "# {mark} ANSIBLE MANAGED - disable ingress-nginx"
+        block: |
+          disable:
+            - rke2-ingress-nginx
+      when: inventory_hostname in groups[rke2_servers_group_name]
+
+    - name: Remove rke2-ingress-nginx HelmChart resource
+      ansible.builtin.shell: |
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml \
+          delete helmchart rke2-ingress-nginx -n kube-system --ignore-not-found
+      args:
+        executable: /bin/bash
+      changed_when: true
+      when:
+        - inventory_hostname == groups[rke2_servers_group_name].0
+        - not ansible_check_mode

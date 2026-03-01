@@ -15,3 +15,28 @@ ansible-playbook site.yml -i inventory.yml --tags gateway_api
 ``` 
 ansible-playbook reset.yml -i inventory.yml
 ```
+
+### How to usage
+1.1 Build docker container <br>
+In Makefile, change `SSH_KEY := $(HOME)/.ssh/Lab/id_ed25519` suitable for your ssh key. <br>
+Run 
+``` 
+make build    # build image only
+make run      # build + launch container (shell drops you in /workspace)
+```
+After you run container, run ansible command `ansible-playbook site.yml -i inventory.yml --tags kubeconfig` to get kubeconfig. <br>
+Export `export KUBECONFIG=~/.kube/2SpeedLab.yaml` and run this command check connect to cluster
+`kgp` <br>
+
+If you want to delete container `make clean`
+```
+
+After installed rke2 cluster, disable rke2-ingress and instead of cilium gateway
+```
+ansible-playbook site.yml -i inventory.yml --tags gateway_api
+```
+
+### Remove rke2
+``` 
+ansible-playbook reset.yml -i inventory.yml
+```
