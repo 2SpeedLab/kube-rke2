@@ -29,3 +29,14 @@ Export `export KUBECONFIG=~/.kube/2SpeedLab.yaml` and run this command check con
 `kgp` <br>
 
 If you want to delete container `make clean`
+```
+
+After installed rke2 cluster, disable rke2-ingress and instead of cilium gateway
+```
+ansible-playbook site.yml -i inventory.yml --tags gateway_api
+```
+
+### Remove rke2
+``` 
+ansible-playbook reset.yml -i inventory.yml
+```
