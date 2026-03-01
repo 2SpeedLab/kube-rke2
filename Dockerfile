@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
     bash \
     jq \
     vim \
+    netcat-traditional \
+    dnsutils \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir \
@@ -34,6 +37,8 @@ RUN curl -fsSL https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz \
 
 # Install oh-my-bash
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" --unattended
+
+RUN wget https://github.com/derailed/k9s/releases/latest/download/k9s_linux_amd64.deb  &&  apt install ./k9s_linux_amd64.deb && rm k9s_linux_amd64.deb
 
 COPY config/.bashrc /root/.bashrc
 COPY config/.vimrc  /root/.vimrc
