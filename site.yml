@@ -8,8 +8,11 @@
     - rke2_install
     - rke2_keepalived
     - rke2_kubevip
-    - rke2_cilium
+    - role: rke2_cilium
+      cilium_role_phase: pre
     - rke2_cluster
+    - role: rke2_cilium
+      cilium_role_phase: post
 
 - name: Post-install - Gateway API CRDs and disable ingress
   hosts: all

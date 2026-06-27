@@ -15,11 +15,11 @@
     flat: yes
   when: inventory_hostname == groups[rke2_servers_group_name].0
 
-- name: Replace 127.0.0.1 with actual server IP (kubeVIP) in kubeconfig
+- name: Replace 127.0.0.1 with actual server IP in kubeconfig
   ansible.builtin.replace:
     path: "{{ kubeconfig_local_path }}/{{ kubeconfig_local_file }}"
     regexp: 'https://127\.0\.0\.1:(\d+)'
-    replace: "https://{{ kube_vip_address }}:{{ kubeconfig_server_port }}"
+    replace: "https://{{ kubeconfig_server_ip }}:{{ kubeconfig_server_port }}"
     mode: '0600'
   delegate_to: localhost
   become: false

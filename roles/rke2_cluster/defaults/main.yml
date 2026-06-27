@@ -78,7 +78,8 @@ rke2_debug: false
 # Do not deploy packaged components and delete any deployed components
 rke2_disable:
 
-# Option to disable kube-proxy
+# Option to disable kube-proxy. Set true only when the selected Cilium mode fully
+# replaces kube-proxy.
 disable_kube_proxy: false
 
 # Option to disable builtin cloud controller

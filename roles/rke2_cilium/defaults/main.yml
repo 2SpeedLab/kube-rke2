@@ -2,6 +2,7 @@
 # Cilium installation method: 'helm' or 'integrated'
 # helm        - install Cilium via Helm chart (requires rke2_cni: none)
 # integrated  - let RKE2 deploy Cilium itself (rke2_cni: cilium); Helm tasks are skipped
+# cilium      - backwards-compatible alias for integrated
 cilium_install_method: integrated
 
 # Cilium Helm chart version
@@ -16,8 +17,16 @@ cilium_release_name: "cilium"
 # Namespace to deploy Cilium into
 cilium_namespace: "kube-system"
 
-# kube-proxy replacement mode (true / false / partial)
-cilium_kubeproxy_replacement: "true"
+# Cilium kube-proxy mode:
+# replacement - disable RKE2 kube-proxy and set kubeProxyReplacement=true
+# kubeproxy   - keep RKE2 kube-proxy enabled and set kubeProxyReplacement=false
+# partial     - keep RKE2 kube-proxy enabled and set kubeProxyReplacement=partial
+cilium_kubeproxy_mode: replacement
+cilium_kubeproxy_replacement_values:
+  replacement: "true"
+  kubeproxy: "false"
+  partial: "partial"
+cilium_kubeproxy_replacement: "{{ cilium_kubeproxy_replacement_values[cilium_kubeproxy_mode] }}"
 
 # Additional helm values passed as --set key=value pairs (string, helm method only)
 cilium_helm_extra_args: ""

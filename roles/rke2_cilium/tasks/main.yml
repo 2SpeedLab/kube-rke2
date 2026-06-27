@@ -1,7 +1,19 @@
 ---
+- name: Validate Cilium options
+  ansible.builtin.assert:
+    that:
+      - cilium_install_method in ['integrated', 'cilium', 'helm']
+      - cilium_kubeproxy_mode in ['replacement', 'kubeproxy', 'partial']
+      - cilium_kubeproxy_replacement | string in ['true', 'false', 'partial']
+    fail_msg: >-
+      Invalid Cilium options. Use cilium_install_method integrated|cilium|helm
+      and cilium_kubeproxy_mode replacement|kubeproxy|partial.
+  run_once: true
+
 - name: Configure Cilium via HelmChartConfig (integrated mode)
   when:
-    - cilium_install_method == 'cilium'
+    - cilium_role_phase | default('pre') == 'pre'
+    - cilium_install_method in ['integrated', 'cilium']
     - inventory_hostname == groups[rke2_servers_group_name].0
   block:
     - name: Deploy rke2-cilium HelmChartConfig
@@ -14,6 +26,7 @@
 
 - name: Install Cilium via Helm chart
   when:
+    - cilium_role_phase | default('post') == 'post'
     - cilium_install_method == 'helm'
     - inventory_hostname == groups[rke2_servers_group_name].0
   block:
@@ -53,6 +66,19 @@
         executable: /bin/bash
       register: cilium_status
       until: cilium_status.rc == 0
+      retries: 40
+      delay: 15
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Wait for all nodes to be ready after Cilium install
+      ansible.builtin.shell: |
+        set -o pipefail
+        {{ rke2_data_path }}/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml get nodes | grep " Ready" | wc -l
+      args:
+        executable: /bin/bash
+      register: cilium_ready_nodes
+      until: "groups[rke2_cluster_group_name] | length == cilium_ready_nodes.stdout | int"
       retries: 40
       delay: 15
       changed_when: false
