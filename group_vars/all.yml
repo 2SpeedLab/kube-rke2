@@ -49,7 +49,7 @@ cilium_install_method: integrated
 #   replacement - disable RKE2 kube-proxy and set Cilium kubeProxyReplacement=true
 #   kubeproxy   - keep RKE2 kube-proxy enabled and set kubeProxyReplacement=false
 #   partial     - keep RKE2 kube-proxy enabled and set kubeProxyReplacement=partial
-cilium_kubeproxy_mode: replacement
+cilium_kubeproxy_mode: kubeproxy
 cilium_kubeproxy_replacement_values:
   replacement: "true"
   kubeproxy: "false"
@@ -58,6 +58,11 @@ cilium_kubeproxy_replacement: "{{ cilium_kubeproxy_replacement_values[cilium_kub
 
 # Disable kube-proxy only when Cilium fully replaces it.
 disable_kube_proxy: "{{ cilium_kubeproxy_mode == 'replacement' }}"
+
+# kube-proxy backend mode when kube-proxy is enabled.
+# Common values: iptables, ipvs, nftables.
+rke2_kube_proxy_mode: iptables
+rke2_kube_proxy_extra_args: []
 
 # CNI is derived from cilium_install_method; override only if you are not using the rke2_cilium role
 rke2_cni: "{{ 'none' if cilium_install_method == 'helm' else 'cilium' }}"

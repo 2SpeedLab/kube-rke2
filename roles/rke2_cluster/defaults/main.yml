@@ -82,6 +82,11 @@ rke2_disable:
 # replaces kube-proxy.
 disable_kube_proxy: false
 
+# kube-proxy backend mode. Leave empty to use the RKE2/kube-proxy default.
+# Common values: iptables, ipvs, nftables.
+rke2_kube_proxy_mode: ""
+rke2_kube_proxy_extra_args: []
+
 # Option to disable builtin cloud controller
 rke2_disable_cloud_controller: false
 

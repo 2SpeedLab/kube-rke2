@@ -16,10 +16,18 @@
     - cilium_install_method in ['integrated', 'cilium']
     - inventory_hostname == groups[rke2_servers_group_name].0
   block:
+    - name: Create RKE2 server manifests directory
+      ansible.builtin.file:
+        path: "{{ rke2_data_path }}/server/manifests"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
     - name: Deploy rke2-cilium HelmChartConfig
       ansible.builtin.template:
         src: rke2-cilium-config.yml.j2
-        dest: /var/lib/rancher/rke2/server/manifests/rke2-cilium-config.yaml
+        dest: "{{ rke2_data_path }}/server/manifests/rke2-cilium-config.yaml"
         owner: root
         group: root
         mode: "0640"

@@ -29,6 +29,9 @@ cilium_kubeproxy_mode: kubeproxy
 
 # Keep kube-proxy enabled and use Cilium partial replacement
 cilium_kubeproxy_mode: partial
+
+# kube-proxy backend mode when kube-proxy is enabled
+rke2_kube_proxy_mode: iptables  # iptables | ipvs | nftables
 ```
 
 After installed rke2 cluster, disable rke2-ingress and instead of cilium gateway
@@ -47,9 +50,13 @@ In Makefile, change `SSH_KEY := $(HOME)/.ssh/Lab/id_ed25519` suitable for your s
 Run 
 ``` 
 make build    # build image only
-make run      # build + launch container (shell drops you in /workspace)
+make env      # build + launch container for manual ansible commands
+make run      # build + fetch kubeconfig, then launch shell
+make new-cluster                         # run ansible-playbook site.yml -i inventory.yml
+make new-cluster INVENTORY=inventory.simple.yml
 ```
-After you run container, run ansible command `ansible-playbook site.yml -i inventory.yml --tags kubeconfig` to get kubeconfig. <br>
+Inside `make env`, run ansible commands manually, for example `ansible-playbook site.yml -i inventory.yml`. <br>
+Run `ansible-playbook site.yml -i inventory.yml --tags kubeconfig` to get kubeconfig. <br>
 Export `export KUBECONFIG=~/.kube/2SpeedLab.yaml` and run this command check connect to cluster
 `kgp` <br>
 

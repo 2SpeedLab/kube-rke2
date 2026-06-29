@@ -94,9 +94,15 @@ kubelet-arg:
   - {{ argument }}
 {% endfor %}
 {% endif %}
-{% if ( rke2_kube_proxy_arg is defined ) %}
+{% set _kube_proxy_mode = rke2_kube_proxy_mode | default('', true) | string | trim %}
+{% set _kube_proxy_args = (
+  (['proxy-mode=' ~ _kube_proxy_mode] if (_kube_proxy_mode | length > 0) else [])
+  + (rke2_kube_proxy_extra_args | default([], true))
+  + (rke2_kube_proxy_arg | default([], true))
+) %}
+{% if (not disable_kube_proxy | bool) and (_kube_proxy_args | length > 0) %}
 kube-proxy-arg:
-{% for argument in rke2_kube_proxy_arg %}
+{% for argument in _kube_proxy_args %}
   - {{ argument }}
 {% endfor %}
 {% endif %}

@@ -1,9 +1,10 @@
 [masters]
-  master-01 ansible_host=10.10.24.229
+  master-01 ansible_host=10.10.25.101
 
 [workers]
-  worker-01 ansible_host=10.10.25.75
-  worker-02 ansible_host=10.10.24.89
+  worker-01 ansible_host=10.10.25.73
+  worker-02 ansible_host=10.10.24.94
+  
 
 [k8s_cluster:children]
   masters

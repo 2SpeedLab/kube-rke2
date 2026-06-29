@@ -1,13 +1,14 @@
 - name: Deploy RKE2
   hosts: all
   become: yes
+  tags: default
   vars_files:
     - group_vars/all.yml
   roles:
     - rke2_prepare
     - rke2_install
-    - rke2_keepalived
-    - rke2_kubevip
+    # - rke2_keepalived
+    # - rke2_kubevip
     - role: rke2_cilium
       cilium_role_phase: pre
     - rke2_cluster
